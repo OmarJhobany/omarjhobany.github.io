@@ -11,7 +11,7 @@
 
 
 
-<title>About This Website</title>
+<title>Acerca de esta WEB</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -293,28 +293,21 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">About This Website</h1>
+<h1 class="title toc-ignore">Acerca de esta WEB</h1>
 
 </div>
 
 
-<p>Informacion sobre la pagina web y R.</p>
-<p>Codigo crud</p>
+<p>Informacion sobre R.</p>
+<p>Codigo fuente CRUD</p>
 <pre class="r"><code>library(shiny)
-library(shinyjs)</code></pre>
-<pre><code>## Answers to common shinyjs questions can be found in the FAQ:
-##  https://deanattali.com/shinyjs/help</code></pre>
-<pre><code>## 
-## Attaching package: &#39;shinyjs&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:shiny&#39;:
-## 
-##     runExample</code></pre>
-<pre><code>## The following objects are masked from &#39;package:methods&#39;:
-## 
-##     removeClass, show</code></pre>
-<pre class="r"><code># Get table metadata. For now, just the fields
-# Further development: also define field types
-# and create inputs generically
+library(shinyjs)
+
+
+
+# Obtener metadatos de tabla. Por ahora, solo los campos
+# Desarrollo adicional: también definir tipos de campo
+# y crear entradas genéricamente
 GetTableMetadata &lt;- function() {
   fields &lt;- c(id = &quot;Id&quot;, 
               name = &quot;Name&quot;, 
@@ -325,8 +318,8 @@ GetTableMetadata &lt;- function() {
   return (result)
 }
 
-# Find the next ID of a new record
-# (in mysql, this could be done by an incremental index)
+# Encuentra el siguiente ID de un nuevo registro
+# (en mysql, esto se hace mediante un índice auto incremental)
 GetNextId &lt;- function() {
   if (exists(&quot;responses&quot;) &amp;&amp; nrow(responses) &gt; 0) {
     max(as.integer(rownames(responses))) + 1
@@ -335,8 +328,8 @@ GetNextId &lt;- function() {
   }
 }
 
-#C
-CreateData &lt;- function(data) {
+#Crear
+Omar_CreateData &lt;- function(data) {
   
   data &lt;- CastData(data)
   rownames(data) &lt;- GetNextId()
@@ -347,8 +340,8 @@ CreateData &lt;- function(data) {
   }
 }
 
-#R
-ReadData &lt;- function() {
+#leer datos
+Omar_ReadData &lt;- function() {
   if (exists(&quot;responses&quot;)) {
     responses
   }
@@ -356,21 +349,21 @@ ReadData &lt;- function() {
 
 
 
-#U
-UpdateData &lt;- function(data) {
+#Actualizar o edirar datos
+Omar_UpdateData &lt;- function(data) {
   data &lt;- CastData(data)
   responses[row.names(responses) == row.names(data), ] &lt;&lt;- data
 }
 
-#D
-DeleteData &lt;- function(data) {
+#Eliminar Datos
+Omar_DeleteData &lt;- function(data) {
   responses &lt;&lt;- responses[row.names(responses) != unname(data[&quot;id&quot;]), ]
 }
 
 
 
 
-# Cast from Inputs to a one-row data.frame
+# Transmitir desde entradas a un data.frame de una fila
 CastData &lt;- function(data) {
   datar &lt;- data.frame(name = data[&quot;name&quot;], 
                       used_shiny = as.logical(data[&quot;used_shiny&quot;]), 
@@ -384,13 +377,13 @@ CastData &lt;- function(data) {
 
 
 
-# Return an empty, new record
+# Devuelve un nuevo registro vacío
 CreateDefaultRecord &lt;- function() {
   mydefault &lt;- CastData(list(id = &quot;0&quot;, name = &quot;&quot;, used_shiny = FALSE, r_num_years = 2))
   return (mydefault)
 }
 
-# Fill the input fields with the values of the selected record in the table
+# Rellena los campos de entrada con los valores del registro seleccionado en la tabla
 UpdateInputs &lt;- function(data, session) {
   updateTextInput(session, &quot;id&quot;, value = unname(rownames(data)))
   updateTextInput(session, &quot;name&quot;, value = unname(data[&quot;name&quot;]))
@@ -400,20 +393,20 @@ UpdateInputs &lt;- function(data, session) {
 
 
 ui &lt;- fluidPage(
-  #use shiny js to disable the ID field
+  #shiny js  para deshabilitar el campo ID
   shinyjs::useShinyjs(),
   
-  #data table
+  #tabla de datos
   DT::dataTableOutput(&quot;responses&quot;, width = 300), 
   
-  #input fields
+  #campos de entrada
   tags$hr(),
   shinyjs::disabled(textInput(&quot;id&quot;, &quot;Id&quot;, &quot;0&quot;)),
   textInput(&quot;name&quot;, &quot;Name&quot;, &quot;&quot;),
   checkboxInput(&quot;used_shiny&quot;, &quot;Used Shiny&quot;, FALSE),
   sliderInput(&quot;r_num_years&quot;, &quot;R Years&quot;, 0, 25, 2, ticks = FALSE),
   
-  #action buttons
+  #Botones de accion / accion de los botones
   actionButton(&quot;submit&quot;, &quot;Submit&quot;),
   actionButton(&quot;new&quot;, &quot;New&quot;),
   actionButton(&quot;delete&quot;, &quot;Delete&quot;)
@@ -422,33 +415,33 @@ ui &lt;- fluidPage(
 
 server &lt;- function(input, output, session) {
   
-  # input fields are treated as a group
+# los campos de entrada se tratan como un grupo
   formData &lt;- reactive({
     sapply(names(GetTableMetadata()$fields), function(x) input[[x]])
   })
   
-  # Click &quot;Submit&quot; button -&gt; save data
+  # Funcion / clic en el botón &quot;Enviar&quot; -&gt; guardar datos
   observeEvent(input$submit, {
     if (input$id != &quot;0&quot;) {
-      UpdateData(formData())
+      Omar_UpdateData(formData())
     } else {
-      CreateData(formData())
+      Omar_CreateData(formData())
       UpdateInputs(CreateDefaultRecord(), session)
     }
   }, priority = 1)
   
-  # Press &quot;New&quot; button -&gt; display empty record
+  # Funcion / Presione el botón &quot;Nuevo&quot; -&gt; mostrar registro vacío
   observeEvent(input$new, {
     UpdateInputs(CreateDefaultRecord(), session)
   })
   
-  # Press &quot;Delete&quot; button -&gt; delete from data
+  # Funcion / Presione el botón &quot;Eliminar&quot; -&gt; eliminar de datos
   observeEvent(input$delete, {
-    DeleteData(formData())
+    Omar_DeleteData(formData())
     UpdateInputs(CreateDefaultRecord(), session)
   }, priority = 1)
   
-  # Select row in table -&gt; show details in inputs
+  # Seleccionar fila en la tabla -&gt; mostrar detalles en entradas
   observeEvent(input$responses_rows_selected, {
     if (length(input$responses_rows_selected) &gt; 0) {
       data &lt;- ReadData()[input$responses_rows_selected, ]
@@ -457,11 +450,11 @@ server &lt;- function(input, output, session) {
     
   })
   
-  # display table
+  # tabla de exhibición
   output$responses &lt;- DT::renderDataTable({
-    #update after submit is clicked
+    #Evento / actualizar después de hacer clic en enviar
     input$submit
-    #update after delete is clicked
+    #Evento / actualizar después de hacer clic en eliminar
     input$delete
     ReadData()
   }, server = FALSE, selection = &quot;single&quot;,
@@ -473,7 +466,7 @@ server &lt;- function(input, output, session) {
 }
 
 
-# Shiny app with 3 fields that the user can submit data for
+
 shinyApp(ui = ui, server = server)</code></pre>
 <div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
 <p>This is an <a href="http://rmarkdown.rstudio.com">R Markdown</a> Notebook. When you execute code within the notebook, the results appear beneath the code.</p>

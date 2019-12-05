@@ -1,10 +1,10 @@
 ---
-title: "About This Website"
+title: "Acerca de esta WEB"
 ---
 
-Informacion sobre la pagina web y R.
+Informacion sobre R.
 
-Codigo crud
+Codigo fuente CRUD
 
 ```{r}
 library(shiny)
@@ -12,9 +12,9 @@ library(shinyjs)
 
 
 
-# Get table metadata. For now, just the fields
-# Further development: also define field types
-# and create inputs generically
+# Obtener metadatos de tabla. Por ahora, solo los campos
+# Desarrollo adicional: también definir tipos de campo
+# y crear entradas genéricamente
 GetTableMetadata <- function() {
   fields <- c(id = "Id", 
               name = "Name", 
@@ -25,8 +25,8 @@ GetTableMetadata <- function() {
   return (result)
 }
 
-# Find the next ID of a new record
-# (in mysql, this could be done by an incremental index)
+# Encuentra el siguiente ID de un nuevo registro
+# (en mysql, esto se hace mediante un índice auto incremental)
 GetNextId <- function() {
   if (exists("responses") && nrow(responses) > 0) {
     max(as.integer(rownames(responses))) + 1
@@ -35,8 +35,8 @@ GetNextId <- function() {
   }
 }
 
-#C
-CreateData <- function(data) {
+#Crear
+Omar_CreateData <- function(data) {
   
   data <- CastData(data)
   rownames(data) <- GetNextId()
@@ -47,8 +47,8 @@ CreateData <- function(data) {
   }
 }
 
-#R
-ReadData <- function() {
+#leer datos
+Omar_ReadData <- function() {
   if (exists("responses")) {
     responses
   }
@@ -56,21 +56,21 @@ ReadData <- function() {
 
 
 
-#U
-UpdateData <- function(data) {
+#Actualizar o edirar datos
+Omar_UpdateData <- function(data) {
   data <- CastData(data)
   responses[row.names(responses) == row.names(data), ] <<- data
 }
 
-#D
-DeleteData <- function(data) {
+#Eliminar Datos
+Omar_DeleteData <- function(data) {
   responses <<- responses[row.names(responses) != unname(data["id"]), ]
 }
 
 
 
 
-# Cast from Inputs to a one-row data.frame
+# Transmitir desde entradas a un data.frame de una fila
 CastData <- function(data) {
   datar <- data.frame(name = data["name"], 
                       used_shiny = as.logical(data["used_shiny"]), 
@@ -84,13 +84,13 @@ CastData <- function(data) {
 
 
 
-# Return an empty, new record
+# Devuelve un nuevo registro vacío
 CreateDefaultRecord <- function() {
   mydefault <- CastData(list(id = "0", name = "", used_shiny = FALSE, r_num_years = 2))
   return (mydefault)
 }
 
-# Fill the input fields with the values of the selected record in the table
+# Rellena los campos de entrada con los valores del registro seleccionado en la tabla
 UpdateInputs <- function(data, session) {
   updateTextInput(session, "id", value = unname(rownames(data)))
   updateTextInput(session, "name", value = unname(data["name"]))
@@ -100,20 +100,20 @@ UpdateInputs <- function(data, session) {
 
 
 ui <- fluidPage(
-  #use shiny js to disable the ID field
+  #shiny js  para deshabilitar el campo ID
   shinyjs::useShinyjs(),
   
-  #data table
+  #tabla de datos
   DT::dataTableOutput("responses", width = 300), 
   
-  #input fields
+  #campos de entrada
   tags$hr(),
   shinyjs::disabled(textInput("id", "Id", "0")),
   textInput("name", "Name", ""),
   checkboxInput("used_shiny", "Used Shiny", FALSE),
   sliderInput("r_num_years", "R Years", 0, 25, 2, ticks = FALSE),
   
-  #action buttons
+  #Botones de accion / accion de los botones
   actionButton("submit", "Submit"),
   actionButton("new", "New"),
   actionButton("delete", "Delete")
@@ -122,33 +122,33 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  # input fields are treated as a group
+# los campos de entrada se tratan como un grupo
   formData <- reactive({
     sapply(names(GetTableMetadata()$fields), function(x) input[[x]])
   })
   
-  # Click "Submit" button -> save data
+  # Funcion / clic en el botón "Enviar" -> guardar datos
   observeEvent(input$submit, {
     if (input$id != "0") {
-      UpdateData(formData())
+      Omar_UpdateData(formData())
     } else {
-      CreateData(formData())
+      Omar_CreateData(formData())
       UpdateInputs(CreateDefaultRecord(), session)
     }
   }, priority = 1)
   
-  # Press "New" button -> display empty record
+  # Funcion / Presione el botón "Nuevo" -> mostrar registro vacío
   observeEvent(input$new, {
     UpdateInputs(CreateDefaultRecord(), session)
   })
   
-  # Press "Delete" button -> delete from data
+  # Funcion / Presione el botón "Eliminar" -> eliminar de datos
   observeEvent(input$delete, {
-    DeleteData(formData())
+    Omar_DeleteData(formData())
     UpdateInputs(CreateDefaultRecord(), session)
   }, priority = 1)
   
-  # Select row in table -> show details in inputs
+  # Seleccionar fila en la tabla -> mostrar detalles en entradas
   observeEvent(input$responses_rows_selected, {
     if (length(input$responses_rows_selected) > 0) {
       data <- ReadData()[input$responses_rows_selected, ]
@@ -157,11 +157,11 @@ server <- function(input, output, session) {
     
   })
   
-  # display table
+  # tabla de exhibición
   output$responses <- DT::renderDataTable({
-    #update after submit is clicked
+    #Evento / actualizar después de hacer clic en enviar
     input$submit
-    #update after delete is clicked
+    #Evento / actualizar después de hacer clic en eliminar
     input$delete
     ReadData()
   }, server = FALSE, selection = "single",
@@ -173,26 +173,11 @@ server <- function(input, output, session) {
 }
 
 
-# Shiny app with 3 fields that the user can submit data for
+
 shinyApp(ui = ui, server = server)
 
 ```
 
 
 
-
-
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
-```{r}
-plot(cars)
-```
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 
