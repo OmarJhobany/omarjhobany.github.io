@@ -2,10 +2,9 @@
 title: "Mi pagina WEB"
 ---
 
-
 *Bienvenidos*
 
-  ![](Resources/CRUD.webp)
+
 
 
 
