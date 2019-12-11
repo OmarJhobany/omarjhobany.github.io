@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Omar" />
+
+<meta name="date" content="2019-11-12" />
+
+<title>Manual de R</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="Manual.html">Manual de R</a>
+</li>
+<li>
+  <a href="https://testfield.shinyapps.io/FIRST_CRUD_R/">CRUD</a>
+</li>
+<li>
+  <a href="https://testfield.shinyapps.io/PDFgenerator/">PDF Proof code</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Manual de R</h1>
+<h4 class="author">Omar</h4>
+<h4 class="date">11/12/2019</h4>
+
+</div>
+
+
+<p><img src="Resources/R.jpg" width="10%" /></p>
+<p><strong>¿Qué es R?</strong></p>
+<p>R es un proyecto de software libre de GNU y se podría definir desde dos puntos de vista, por una parte, es un lenguaje de programación y por otra un entorno de trabajo, estando ambos orientados al cálculo estadístico y a la generación de gráficas.</p>
+<p>Como lenguaje de programación proporciona una amplia variedad de técnicas y recursos para el trabajo con gráficas y análisis estadístico y, a su vez, es altamente ampliable. Cuenta con una comunidad extensa de desarrolladores, investigadores y usuarios. Se distribuye con licencia GNU GPL v2 y está disponible para distintos sistemas operativos de tipo Unix y similares (FreeBSD y Linux), Windows y Mac OS. Como entorno de trabajo se entiende como un sistema totalmente planificado y coherente y no una acumulación incremental de herramientas muy específicas y poco flexibles, como es frecuentemente el caso con otro software de análisis de datos. En este caso el entorno de trabajo R nos proporciona una serie de utilidades para manipulación de datos, cálculo y representación gráfica.</p>
+<p><strong>¿Qué es RStudio?</strong> RStudio es un entorno de desarrollo integrado (IDE) para R. Es software libre con licencia GPLv3 y se puede ejecutar sobre distintas plataformas (Windows, Mac, o Linux) o incluso desde la web usando RStudio Server. Instalación de R y RStudio (en Windows).</p>
+<p><strong>Instalar R</strong> para ello descargamos del sitio oficial de R la última revisión estable, la 2.15.0, pulsando en Windows (en mi caso) y después pulsando en base y de ahí nos bajamos R-2.15.0-win.exe. Haciendo doble click sobre el fichero comenzamos la instalación. Saldrá el típico aviso de Windows de que no se puede comprobar el editor, no le hacemos caso y pulsamos en ejecutar. A veces también sale otra ventana indicando que hay que permitir la ejecución del paquete ya que requiere privilegios de administrador.</p>
+<center>
+<p><img src="Resources/1.png" width="50%" /></p>
+</center>
+<p>Después solicita el idioma de instalación</p>
+<center>
+<p><img src="Resources/2.png" width="50%" /></p>
+</center>
+<p>A continuación, arranca el Asistente de instalación, pulsar siguiente.</p>
+<center>
+<p><img src="Resources/3.png" width="50%" /></p>
+</center>
+<p>Después informa sobre el tipo de licencia, pulsar siguiente.</p>
+<center>
+<p><img src="Resources/4.png" width="50%" /></p>
+</center>
+<p>A continuación, nos indica la ruta de instalación, pulsar siguiente.</p>
+<center>
+<p><img src="Resources/5.png" width="50%" /></p>
+</center>
+<p>Ahora seleccionamos los paquetes a instalar, pulsar siguiente.</p>
+<center>
+<p><img src="Resources/6.png" width="50%" /></p>
+</center>
+<p>Después nos pregunta si queremos usar las opciones de configuración o no, por defecto aparece no y aquí tampoco nos vamos a complicar demasiado, pulsar siguiente.</p>
+<center>
+<p><img src="Resources/7.png" width="50%" /></p>
+</center>
+<p>Elegir la carpeta del menú inicio donde colocar los accesos directos a los elementos del paquete, pulsar siguiente.</p>
+<center>
+<p><img src="Resources/8.png" width="50%" /></p>
+</center>
+<p>Selección de las tareas adicionales: crear icono en el escritorio, …, pulsar siguiente.</p>
+<center>
+<p><img src="Resources/9.png" width="50%" /></p>
+</center>
+<p>En este preciso instante se inicia el desempaquetado e instalación de la aplicación que tardará muy poco, en mi caso uno 50 segundos aproximadamente.</p>
+<center>
+<p><img src="Resources/10.png" width="50%" /></p>
+</center>
+<p>Una vez finalizada el proceso de instalación sale una ventana indicándolo. Pulsar Finalizar.</p>
+<center>
+<p><img src="Resources/11.png" width="50%" /></p>
+</center>
+<p>Ya nos aparecerá el correspondiente icono en el escritorio.</p>
+<center>
+<p><img src="Resources/12.png" width="50%" /></p>
+</center>
+<p>Arrancar el entorno.</p>
+<center>
+<p><img src="Resources/13.png" width="50%" /></p>
+</center>
+<center>
+<img src="Resources/linea.png" width="20%" height="500%" />
+</center>
+<p><strong>Instalar RStudio</strong>, para ello descargo la última versión estable (0,96 en estos momentos) del sitio oficial de RStudio. En mi caso he descargado RStudio-0.96.304.exe para Windows, si tenemos R corriendo en un servidor Linux, existe una versión para instalarla en dicho servidor y ejecutarla desde un navegador web que no voy a describir en estos momentos. Comienzo ejecutando el instalador anteriormente descargado y, como en el caso anterior, nos volverá a salir el típico aviso de Windows de que no se puede comprobar el editor, no le hacemos caso y pulsamos en ejecutar. A veces también sale otra ventana indicando que hay que permitir la ejecución del paquete ya que requiere privilegios de administrador.</p>
+<center>
+<p><img src="Resources/14.png" width="50%" /></p>
+</center>
+<p>A continuación, aparece el Asistente de instalación, pulsar siguiente.</p>
+<center>
+<p><img src="Resources/15.png" width="50%" /></p>
+</center>
+<p>Después nos pide el lugar de instalación del paquete, pulsar siguiente.</p>
+<center>
+<p><img src="Resources/16.png" width="50%" /></p>
+</center>
+<p>Elegir la carpeta del menú inicio donde colocar los accesos directos a los elementos del paquete, pulsar Instalar.</p>
+<center>
+<p><img src="Resources/17.png" width="50%" /></p>
+</center>
+<p>Y comienza la instalación que dura menos de un minuto (El tiempo puede variar dependiendo de la velocdad de la conexion a la red WIFI ).</p>
+<center>
+<p><img src="Resources/18.png" width="50%" /></p>
+</center>
+<p>Para finalizar aparece el asistente indicando que ha finalizado la instalación. Pulsar Terminar.</p>
+<center>
+<p><img src="Resources/19.png" width="50%" /></p>
+</center>
+<p>Como no marqué la opción de Accesos directos tres pantallas más atrás me he tenido que crear a mano el acceso en el escritorio, pero ese no es un asunto de este post. Quedando como sigue.</p>
+<center>
+<p><img src="Resources/20.png" width="50%" /></p>
+</center>
+<p>Al arrancar RStudio nos aparece lo siguiente:</p>
+<center>
+<p><img src="Resources/21.png" width="50%" /></p>
+</center>
+<p>Como podemos ver y si no queremos complicarnos mucho, esta es una típica instalación en Windows del tipo siguiente, siguiente, siguiente.</p>
+<center>
+<p><img src="Resources/next.png" width="50%" /></p>
+</center>
+<p><strong>Publicar proyectos de R Shiny</strong> <em>en shinyapps.io</em> <em><a href="https://www.shinyapps.io/" class="uri">https://www.shinyapps.io/</a></em></p>
+<p><strong>Publicar proyectos de R Markdown</strong> <em>en GotHub</em></p>
+<p>Publicar website hecho de R en Github</p>
+<p>rmarkdown::rendersite() un website (file html) usando la function rmarkdown::rendersite() en R. Funciona muy bien, pero es solo un file html.</p>
+<p>En resumen, aquí hay una forma:</p>
+<pre><code>Crea un file html
+Crear docs/ directory
+Vaya a la configuration y habilite el directory docs/ .
+Coloque el file allí en docs/ . Estás listo.</code></pre>
+<p>Un ejemplo es, esta página web correspondiente a este file basado en este directory de viñetas .</p>
+<p>Mover los files es simple también; podrías usar Travis u otros medios. Un enfoque anterior usaba una twig separada gh-pages , pero la forma actual es más simple.</p>
+<pre><code>Uso de &#39;git pull&#39; frente a &#39;git checkout -f&#39; para la implementación del website
+Implementación de Laravel con Git
+¿Cómo se manejan los files excluidos con aspnet_compiler?
+implementar website desde el control de la versión - exportar y enlaces simbólicos?
+Git: implementa versiones de testing y producción de aplicaciones web en diferentes serveres
+Despliegue automático de github para sitios web estáticos
+Cómo actualizar un website (git deploy) manteniendo el tree de trabajo &#39;sucio&#39;
+python manage.py collectstatic - error de input al implementar el proyecto Django en Heroku
+Autodeploy con git
+No se puede implementar. El tablero de Heroku muestra &quot;Última compilation falló&quot;
+¿Cómo administrar el control de versiones y las implementaciones de producción para los activos comstackdos con Git y Grunt / Sass / Composer?
+Implementación multisitio utilizando git y un CI
+Combinar website en el repository git con TFS Build</code></pre>
+<p>Para crear un repositorio y alojar la pagina WEB es importante descargar git en la maquina fisica R studio lo detectara en automatico, y permitira automatizar el proseso de publicacion.</p>
+<p><em>link a github para codigo de Pagina WEB en R Markdown </em> <em><a href="https://github.com/OmarJhobany/omarjhobany.github.io" class="uri">https://github.com/OmarJhobany/omarjhobany.github.io</a></em></p>
+<center>
+<p><img src="Resources/GitHub.jpg" width="50%" /></p>
+</center>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

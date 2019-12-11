@@ -279,7 +279,13 @@ $(document).ready(function () {
   <a href="about.html">About</a>
 </li>
 <li>
+  <a href="Manual.html">Manual de R</a>
+</li>
+<li>
   <a href="https://testfield.shinyapps.io/FIRST_CRUD_R/">CRUD</a>
+</li>
+<li>
+  <a href="https://testfield.shinyapps.io/PDFgenerator/">PDF Proof code</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -298,9 +304,9 @@ $(document).ready(function () {
 </div>
 
 
-<p><em>Informacion sobre R.</em></p>
+<p><em>link a github para codigo de Pagina WEB en R Markdown </em> <em><a href="https://github.com/OmarJhobany/omarjhobany.github.io" class="uri">https://github.com/OmarJhobany/omarjhobany.github.io</a></em> <img src="Resources/GitHub.jpg" width="100%" /></p>
 <p><em>Codigo fuente del CRUD en R SHINY</em></p>
-<pre class="r"><code>#Librerias
+<pre class="{r"><code>#Librerias
 
 library(shiny)
 library(shinyjs)
@@ -540,9 +546,43 @@ server &lt;- function(input, output, session) {
     
 }
 
-shinyApp(ui = ui, server = server)</code></pre>
-<div style="width: 100% ; height: 400px ; text-align: center; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;" class="muted well">Shiny applications not supported in static R Markdown documents</div>
-<p><em>link a github para codigo de Pagina WEB en R Markdown </em></p>
+shinyApp(ui = ui, server = server)
+}
+</code></pre>
+<p><em>Prueba de la generacion de reportes con datos dinamicos</em></p>
+<p><em>Codigo PAra generacion de pdf</em></p>
+<pre class="{r"><code>shinyApp(
+    ui = fluidPage(
+        sliderInput(&quot;slider&quot;, &quot;Slider&quot;, 1, 100, 50),
+        downloadButton(&quot;report&quot;, &quot;Generate report&quot;)
+    ),
+    server = function(input, output) {
+        output$report &lt;- downloadHandler(
+            # For PDF output, change this to &quot;report.pdf&quot;
+            filename = &quot;report.html&quot;,
+            content = function(file) {
+                # Copy the report file to a temporary directory before processing it, in
+                # case we don&#39;t have write permissions to the current working dir (which
+                # can happen when deployed).
+                tempReport &lt;- file.path(tempdir(), &quot;report.Rmd&quot;)
+                file.copy(&quot;report.Rmd&quot;, tempReport, overwrite = TRUE)
+                
+                # Set up parameters to pass to Rmd document
+                params &lt;- list(n = input$slider)
+                
+                # Knit the document, passing in the `params` list, and eval it in a
+                # child of the global environment (this isolates the code in the document
+                # from the code in this app).
+                rmarkdown::render(tempReport, output_file = file,
+                                  params = params,
+                                  envir = new.env(parent = globalenv())
+                )
+            }
+        )
+    }
+)
+}
+</code></pre>
 
 
 

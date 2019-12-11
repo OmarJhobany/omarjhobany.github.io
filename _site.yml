@@ -7,9 +7,13 @@ navbar:
       href: index.html
     - text: "About"
       href: about.html
+    - text: "Manual de R"
+      href: Manual.html
     - text: "CRUD"
       href: https://testfield.shinyapps.io/FIRST_CRUD_R/
-
+    - text: "PDF Proof code"
+      href: https://testfield.shinyapps.io/PDFgenerator/
+      
 output:
   html_document:
     theme: cosmo
