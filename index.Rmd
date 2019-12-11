@@ -3,8 +3,9 @@ title: "Mi pagina WEB"
 ---
 
 *Bienvenidos*
-
-
+```{r pressure, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("Resources/CRUD.webp")
+```
 
 
 

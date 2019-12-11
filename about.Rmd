@@ -2,181 +2,254 @@
 title: "Acerca de esta WEB"
 ---
 
-Informacion sobre R.
+*Informacion sobre R.*
 
-Codigo fuente CRUD
+*Codigo fuente del CRUD en R SHINY*
 
 ```{r}
+#Librerias
+
 library(shiny)
 library(shinyjs)
-
-
+library(rmarkdown)
+library(markdown)
+library(yaml)
 
 # Obtener metadatos de tabla. Por ahora, solo los campos
 # Desarrollo adicional: también definir tipos de campo
 # y crear entradas genéricamente
 GetTableMetadata <- function() {
-  fields <- c(id = "Id", 
-              name = "Name", 
-              used_shiny = "Used Shiny", 
-              r_num_years = "R Years")
-  
-  result <- list(fields = fields)
-  return (result)
+    fields <- c(id = "Id", 
+                name = "Name", 
+                used_shiny = "Used Shiny", 
+                r_num_years = "R Years")
+    
+    result <- list(fields = fields)
+    return (result)
 }
+
+#>----------------------------------------------------------------------<#
 
 # Encuentra el siguiente ID de un nuevo registro
 # (en mysql, esto se hace mediante un índice auto incremental)
 GetNextId <- function() {
-  if (exists("responses") && nrow(responses) > 0) {
-    max(as.integer(rownames(responses))) + 1
-  } else {
-    return (1)
-  }
+    if (exists("responses") && nrow(responses) > 0) {
+        max(as.integer(rownames(responses))) + 1
+    } else {
+        return (1)
+    }
 }
 
-#Crear
+#----------------------------------Funciones-----------------------------#
+
+#Create (Crear)
 Omar_CreateData <- function(data) {
-  
-  data <- CastData(data)
-  rownames(data) <- GetNextId()
-  if (exists("responses")) {
-    responses <<- rbind(responses, data)
-  } else {
-    responses <<- data
-  }
+    
+    data <- CastData(data)
+    rownames(data) <- GetNextId()
+    if (exists("responses")) {
+        responses <<- rbind(responses, data)
+    } else {
+        responses <<- data
+    }
 }
 
-#leer datos
+#Read (Leer)
 Omar_ReadData <- function() {
-  if (exists("responses")) {
-    responses
-  }
+    if (exists("responses")) {
+        responses
+    }
 }
 
-
-
-#Actualizar o edirar datos
+#Update (Actualizar)
 Omar_UpdateData <- function(data) {
-  data <- CastData(data)
-  responses[row.names(responses) == row.names(data), ] <<- data
+    data <- CastData(data)
+    responses[row.names(responses) == row.names(data), ] <<- data
 }
 
-#Eliminar Datos
+#Delete (Eliminar)
 Omar_DeleteData <- function(data) {
-  responses <<- responses[row.names(responses) != unname(data["id"]), ]
+    responses <<- responses[row.names(responses) != unname(data["id"]), ]
 }
 
 
-
+#>----------------------------------------------------------------------<#
 
 # Transmitir desde entradas a un data.frame de una fila
 CastData <- function(data) {
-  datar <- data.frame(name = data["name"], 
-                      used_shiny = as.logical(data["used_shiny"]), 
-                      r_num_years = as.integer(data["r_num_years"]),
-                      stringsAsFactors = FALSE)
-
-  rownames(datar) <- data["id"]
-  return (datar)
+    datar <- data.frame(name = data["name"], 
+                        used_shiny = as.logical(data["used_shiny"]), 
+                        r_num_years = as.integer(data["r_num_years"]),
+                        stringsAsFactors = FALSE)
+    
+    rownames(datar) <- data["id"]
+    return (datar)
 }
 
-
-
+#>----------------------------------------------------------------------<#
 
 # Devuelve un nuevo registro vacío
 CreateDefaultRecord <- function() {
-  mydefault <- CastData(list(id = "0", name = "", used_shiny = FALSE, r_num_years = 2))
-  return (mydefault)
+    mydefault <- CastData(list(id = "0", name = "", used_shiny = FALSE, r_num_years = 2))
+    return (mydefault)
 }
+
+#>----------------------------------------------------------------------<#
 
 # Rellena los campos de entrada con los valores del registro seleccionado en la tabla
 UpdateInputs <- function(data, session) {
-  updateTextInput(session, "id", value = unname(rownames(data)))
-  updateTextInput(session, "name", value = unname(data["name"]))
-  updateCheckboxInput(session, "used_shiny", value = as.logical(data["used_shiny"]))
-  updateSliderInput(session, "r_num_years", value = as.integer(data["r_num_years"]))
+    updateTextInput(session, "id", value = unname(rownames(data)))
+    updateTextInput(session, "name", value = unname(data["name"]))
+    updateCheckboxInput(session, "used_shiny", value = as.logical(data["used_shiny"]))
+    updateSliderInput(session, "r_num_years", value = as.integer(data["r_num_years"]))
 }
-
+ 
+#>----------------------------------------------------------------------<#
 
 ui <- fluidPage(
-  #shiny js  para deshabilitar el campo ID
-  shinyjs::useShinyjs(),
+    #shiny js  para deshabilitar el campo ID
+    shinyjs::useShinyjs(),
+    
+    #Tabla de datos
+    DT::dataTableOutput("responses", width = 300), 
+    
+    #campos de entrada
+    tags$hr(),
+    shinyjs::disabled(textInput("id", "Id", "0")),
+    textInput("name", "Name", ""),
+    checkboxInput("used_shiny", "Used Shiny", FALSE),
+    sliderInput("r_num_years", "R Years", 0, 25, 2, ticks = FALSE),
+    selectInput("var3", label = "File", choices = list("pdf")),
+    
+    #Botones de accion / accion de los botones
+    actionButton("submit", "Submit"),
+    actionButton("new", "New"),
+    actionButton("delete", "Delete"),
+    
+    
+    #Salida de texto 
+    textOutput("text"),
+    #Boton de Descarga
+    downloadButton(outputId = "down", "Generate Report")
+    
   
-  #tabla de datos
-  DT::dataTableOutput("responses", width = 300), 
-  
-  #campos de entrada
-  tags$hr(),
-  shinyjs::disabled(textInput("id", "Id", "0")),
-  textInput("name", "Name", ""),
-  checkboxInput("used_shiny", "Used Shiny", FALSE),
-  sliderInput("r_num_years", "R Years", 0, 25, 2, ticks = FALSE),
-  
-  #Botones de accion / accion de los botones
-  actionButton("submit", "Submit"),
-  actionButton("new", "New"),
-  actionButton("delete", "Delete")
+    
+
 )
 
 
+#>----------------------------------------------------------------------<#
+#Funciones del servidor
 server <- function(input, output, session) {
-  
-# los campos de entrada se tratan como un grupo
-  formData <- reactive({
-    sapply(names(GetTableMetadata()$fields), function(x) input[[x]])
-  })
-  
-  # Funcion / clic en el botón "Enviar" -> guardar datos
-  observeEvent(input$submit, {
-    if (input$id != "0") {
-      Omar_UpdateData(formData())
-    } else {
-      Omar_CreateData(formData())
-      UpdateInputs(CreateDefaultRecord(), session)
-    }
-  }, priority = 1)
-  
-  # Funcion / Presione el botón "Nuevo" -> mostrar registro vacío
-  observeEvent(input$new, {
-    UpdateInputs(CreateDefaultRecord(), session)
-  })
-  
-  # Funcion / Presione el botón "Eliminar" -> eliminar de datos
-  observeEvent(input$delete, {
-    Omar_DeleteData(formData())
-    UpdateInputs(CreateDefaultRecord(), session)
-  }, priority = 1)
-  
-  # Seleccionar fila en la tabla -> mostrar detalles en entradas
-  observeEvent(input$responses_rows_selected, {
-    if (length(input$responses_rows_selected) > 0) {
-      data <- ReadData()[input$responses_rows_selected, ]
-      UpdateInputs(data, session)
-    }
+
+#Captura de datos en variables temporales     
+    d <- reactive({
+     iris[(input$id)]
+     })
+   
+    a <- reactive({
+      iris[(input$name)]
+      })
     
-  })
+    b <- reactive({
+      iris[(input$used_shiny)]
+    })
+    
+    c <- reactive({
+      iris[(input$r_num_years)]
+    })
+    
+    output$text <- renderText({
+      text(d(), a(), b(), c())
+      
+    })
+ #Salida del documento PDF con el evento downloadHandler   
+  output$down <- downloadHandler(
+    #espesificacion del nombre del documento
+    filename = function(){
+      #Creacion del documento en R Markdown
+      #iris.pdf
+      paste("iris", input$var3, sep = ".")
+    },
+    content = function(file){
+      pdf(file)
+      text(d(),a(),b(),c())
+    }
+  )
   
-  # tabla de exhibición
-  output$responses <- DT::renderDataTable({
-    #Evento / actualizar después de hacer clic en enviar
-    input$submit
-    #Evento / actualizar después de hacer clic en eliminar
-    input$delete
-    ReadData()
-  }, server = FALSE, selection = "single",
-  colnames = unname(GetTableMetadata()$fields)[-1]
-  )     
   
-  
-  
+    
+  # los campos de entrada se tratan como un grupo
+    formData <- reactive({
+        sapply(names(GetTableMetadata()$fields), function(x) input[[x]])
+    })
+    
+#>----------------------------------------------------------------------<#
+    
+    # Funcion / click en el botón "Enviar" -> guardar datos
+    observeEvent(input$submit, {
+        if (input$id != "0") {
+          Omar_UpdateData(formData())
+        } else {
+          Omar_CreateData(formData())
+          UpdateInputs(CreateDefaultRecord(), session)
+        }
+    }, priority = 1)
+
+#>----------------------------------------------------------------------<#        
+    
+    # Funcion / Presione el botón "Nuevo" -> mostrar registro vacío
+    observeEvent(input$new, {
+        UpdateInputs(CreateDefaultRecord(), session)
+    })
+
+#>----------------------------------------------------------------------<#
+       
+    # Funcion / Presione el botón "Eliminar" -> eliminar de datos
+    observeEvent(input$delete, {
+      Omar_DeleteData(formData())
+        UpdateInputs(CreateDefaultRecord(), session)
+    }, priority = 1)
+    
+#>----------------------------------------------------------------------<#
+    
+    # Seleccionar fila en la tabla -> mostrar detalles en entradas
+    observeEvent(input$responses_rows_selected, {
+        if (length(input$responses_rows_selected) > 0) {
+            data <- ReadData()[input$responses_rows_selected, ]
+            UpdateInputs(data, session)
+        }
+        
+    })
+
+    
+#>----------------------------------------------------------------------<# 
+     
+    # tabla de exhibición
+    output$responses <- DT::renderDataTable({
+     
+      #Evento / actualizar después de hacer clic en enviar
+        input$submit
+      #Evento / actualizar después de hacer clic en eliminar
+        input$delete
+        Omar_ReadData()
+     
+    },
+    server = FALSE, selection = "single",
+    colnames = unname(GetTableMetadata()$fields)[-1]
+    )     
+
+    
+    
+    
+#>----------------------------------------------------------------------<# 
+    
+    
 }
-
-
 
 shinyApp(ui = ui, server = server)
 
 ```
 
-
+*link a github para codigo de Pagina WEB en R Markdown *
 
